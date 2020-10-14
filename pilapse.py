@@ -29,6 +29,7 @@ from picamera import PiCamera
 from time import sleep
 import os, shutil
 from getch import pause
+import ffmpeg
 import logging
 
 def pilapse(args):
@@ -46,7 +47,7 @@ def pilapse(args):
 
     logging.debug("Getting timelapse interval")
     interval = getInterval(args)
-    logging.info("Setting timelapse interval of {0}".format(interval))
+    logging.info("Setting timelapse interval of {0} seconds".format(interval))
 
     for i in range(5, 0, -1):
       sleep(1)
@@ -69,7 +70,14 @@ def pilapse(args):
         logging.debug("Taking a {0}s interval".format(str(interval)))
     
     
-    
+    logging.info("Converting imgs to video file")
+    (
+        ffmpeg
+        .input('./tmp/*.jpg', pattern_type='glob', framerate=25)
+        .output('movie.mp4')
+        .run(quiet=True)
+    )
+
     logging.debug("Removing tmp photo directory")
     shutil.rmtree('tmp/')
 
