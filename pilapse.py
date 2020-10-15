@@ -31,6 +31,14 @@ import os, shutil
 from getch import pause
 import ffmpeg
 import logging
+import smtplib 
+from email.mime.multipart import MIMEMultipart 
+from email.mime.text import MIMEText 
+from email.mime.base import MIMEBase 
+from email import encoders 
+
+fromaddr = "EMAIL ADDRESS OF THE SENDER"
+passwd = "EMAIL PASSWORD OF THE SENDER"
 
 def pilapse(args):
     loggingSetter(args, logging)
@@ -78,8 +86,14 @@ def pilapse(args):
         .run(quiet=True)
     )
 
+    logging.info("Emailing video to {0}".format(",".join(args['--email'])))
+    email(fromaddr, ",".join(args['--email']), passwd)
+
     logging.debug("Removing tmp photo directory")
     shutil.rmtree('tmp/')
+    
+    logging.debug("Removing movie.mp4 file")
+    os.remove("movie.mp4")
 
 
 
@@ -101,6 +115,7 @@ def loggingSetter(args, logging):
     else:
       logging.basicConfig(format='LOGGING: %(message)s', level=logging.INFO)
 
+
 def getInterval(args):
     interval = 5
     intervalStr = args['--interval']
@@ -117,6 +132,28 @@ def getInterval(args):
     else:
       raise Exception("Interval format not accepted")
     return interval
+
+
+def email(fromaddr, toaddr, passwd):
+    msg = MIMEMultipart() 
+    msg['From'] = fromaddr 
+    msg['To'] = toaddr
+    msg['Subject'] = "Timelapse from pilapse"
+    body = "The timelapse is attached to this email"
+    msg.attach(MIMEText(body, 'plain')) 
+    filename = 'movie.mp4'
+    attachment = open("movie.mp4", "rb") 
+    p = MIMEBase('application', 'octet-stream') 
+    p.set_payload((attachment).read()) 
+    encoders.encode_base64(p) 
+    p.add_header('Content-Disposition', "attachment; filename= %s" % filename) 
+    msg.attach(p) 
+    s = smtplib.SMTP('smtp.gmail.com', 587) 
+    s.starttls() 
+    s.login(fromaddr, passwd) 
+    text = msg.as_string() 
+    s.sendmail(fromaddr, toaddr, text) 
+    s.quit() 
 
 if __name__ == '__main__':
     args = docopt(__doc__, version='PiLapse 1.0')
