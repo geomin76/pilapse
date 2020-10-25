@@ -14,7 +14,7 @@ Setting up the arducam
 
 Open pilapse.py, go to line 40 and 41 and fill in the `EMAIL ADDRESS OF THE SENDER` and `EMAIL PASSWORD OF THE SENDER`
 
-Ensure that your email is allowing "less secure apps" to access the account
+Ensure that your email is allowing "less secure apps" to access the email account
 - [Gmail](https://www.google.com/settings/security/lesssecureapps)
 - [Yahoo](https://support.reolink.com/hc/en-us/articles/360004195474-How-to-Allow-Less-Secure-Apps-to-Access-Your-Yahoo-Mail)
 - [Outlook](https://answers.microsoft.com/en-us/msoffice/forum/msoffice_outlook-mso_win10-mso_365hp/outlook-security/e92fbfb5-504e-4709-85ce-4996c5a6f14a)
@@ -52,6 +52,6 @@ Options:
   --help                Show this scre
 ```
 
-Examples:
+### Examples
 - `pilapse.py --interval 10s --photos 100 --email someone@email.com`
     - This command will take 100 photos in 10 second intervals (1000 seconds or 16.67 minutes). After the time lapse is complete, it will email to someone@email.com
