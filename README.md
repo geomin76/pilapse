@@ -54,4 +54,4 @@ Options:
 
 Examples:
 - `pilapse.py --interval 10s --photos 100 --email someone@email.com`
-..* This command will take 100 photos in 10 second intervals (1000 seconds or 16.67 minutes). After the time lapse is complete, it will email to someone@email.com
+-- This command will take 100 photos in 10 second intervals (1000 seconds or 16.67 minutes). After the time lapse is complete, it will email to someone@email.com
