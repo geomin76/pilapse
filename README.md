@@ -55,3 +55,7 @@ Options:
 ### Examples
 - `pilapse.py --interval 10s --photos 100 --email someone@email.com`
     - This command will take 100 photos in 10 second intervals (1000 seconds or 16.67 minutes). After the time lapse is complete, it will email to someone@email.com
+- `pilapse.py -v --cliplen 5m --email someone@email.com`
+    - This command will create a 5 minute timelapse video with default 5 second intervals. After the time lapse is complete, it will email to someone@email.com. The Python file will also provide verbose logging.
+- `pilapse.py -q --interval 3s --time 4h --email someone@email.com`
+    - This command will take a timelapse of 4 hours with 3 second intervals. After the time lapse is complete, it will email to someone@email.com. The Python file will also provide quiet logging.
