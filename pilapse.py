@@ -30,6 +30,7 @@ from time import sleep
 import os, shutil
 from getch import pause
 import ffmpeg
+from datetime import datetime
 import logging
 import smtplib 
 from email.mime.multipart import MIMEMultipart 
@@ -39,6 +40,7 @@ from email import encoders
 
 fromaddr = "EMAIL ADDRESS OF THE SENDER"
 passwd = "EMAIL PASSWORD OF THE SENDER"
+fps = 25
 
 def pilapse(args):
     loggingSetter(args, logging)
@@ -56,6 +58,12 @@ def pilapse(args):
     logging.debug("Getting timelapse interval")
     interval = getInterval(args)
     logging.info("Setting timelapse interval of {0} seconds".format(interval))
+
+    logging.debug("Removing tmp photo directory in case it still exists")
+    shutil.rmtree('tmp/')
+    
+    logging.debug("Removing movie.mp4 file in case it still exists")
+    os.remove("movie.mp4")
 
     for i in range(5, 0, -1):
       sleep(1)
@@ -76,12 +84,39 @@ def pilapse(args):
         logging.debug("Saved in /tmp")
         sleep(interval)
         logging.debug("Taking a {0}s interval".format(str(interval)))
+
+
+    if args['--time']:
+      logging.info("Taking timelapse of with time of {0}".format(args['VALUE']))
+      time = getTime(args['VALUE'])
+      now = datetime.timestamp(datetime.now())
+      finishedTime = now + time
+      count = 1
+      while now <= finishedTime:
+        logging.info("Taking photo {0}".format(str(count)))
+        camera.capture('tmp/{0}.jpg'.format(str(count)))
+        logging.debug("Saved in /tmp")
+        sleep(interval)
+        logging.debug("Taking a {0}s interval".format(str(interval)))
+        count += 1
+        now = datetime.timestamp(datetime.now())
+
+
+    if args['--cliplen']:
+      logging.info("Taking timelapse of {0} clip length".format(args['VALUE']))
+      time = getTime(args['VALUE'])
+      for i in range(time * fps):
+        logging.info("Taking photo {0}".format(str(i)))
+        camera.capture('tmp/{0}.jpg'.format(str(i)))
+        logging.debug("Saved in /tmp")
+        sleep(interval)
+        logging.debug("Taking a {0}s interval".format(str(interval)))
     
     
     logging.info("Converting imgs to video file")
     (
         ffmpeg
-        .input('./tmp/*.jpg', pattern_type='glob', framerate=25)
+        .input('./tmp/*.jpg', pattern_type='glob', framerate=fps)
         .output('movie.mp4')
         .run(quiet=True)
     )
@@ -132,6 +167,22 @@ def getInterval(args):
     else:
       raise Exception("Interval format not accepted")
     return interval
+
+
+def getTime(val):
+    if val.isdigit():
+      time = int(val)      
+    elif val[-1] == 's':
+      time = int(val[:-1])
+    elif val[-1] == 'm':
+      time = int(val[:-1]) * 60
+    elif val[-1] == 'h':
+      time = int(val[:-1]) * 3600
+    elif val[-1] == 'd':
+      time = int(val[:-1]) * 86400
+    else:
+      raise Exception("Time format not accepted")
+    return time
 
 
 def email(fromaddr, toaddr, passwd):
